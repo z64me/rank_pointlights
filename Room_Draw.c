@@ -6,20 +6,8 @@
 0xB19B5C   ROM_ADDR
 */
 
-static
-inline
-int
-room_uses_pointlights(void *roomSegment)
-{
-	char *header = roomSegment;
-	
-	/* locate 'end header' command */
-	while (*header != 0x14)
-		header += 8;
-	
-	/* command's second byte says whether to use point lights */
-	return header[1];
-}
+extern int room_uses_pointlights(void *roomSegment);
+asm("room_uses_pointlights = 0x8007A824;");
 
 static
 inline
