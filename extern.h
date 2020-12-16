@@ -29,6 +29,9 @@ asm("gSegments = 0x80166FA8;");
 extern GameInfo *gGameInfo;
 asm("gGameInfo = 0x8015FA90;");
 
+extern SaveContext gSaveContext;
+asm("gSaveContext = 0x8015E660;");
+
 extern void bzero(void *dst, const int num);
 asm("bzero = 0x80004450;");
 
