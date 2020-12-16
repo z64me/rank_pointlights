@@ -145,7 +145,9 @@ void Room_Draw(GlobalContext *globalCtx, Room *room, u32 flags)
 	/* don't process rooms that point to nothing */
 	if (!room->segment)
 		return;
-	
+		
+	gSegments[3] = VIRTUAL_TO_PHYSICAL(room->segment);
+
 	/* room may have despawned: destroy expired point lights */
 	destroy_expired_RoomPointLights(globalCtx);
 	
@@ -159,7 +161,7 @@ void Room_Draw(GlobalContext *globalCtx, Room *room, u32 flags)
 		Lights_HackyLightBind(sp228, globalCtx->lightCtx.listHead, room);
 		Lights_Draw(sp228, globalCtx->state.gfxCtx);
 	}
-	gSegments[3] = VIRTUAL_TO_PHYSICAL(room->segment);
+
 #if 0
 	if (room->mesh->polygon.type >= ARRAY_COUNTU(sRoomDrawHandlers))
 	{
