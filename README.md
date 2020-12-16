@@ -6,6 +6,7 @@ OoT debug
 
 func_80098B74.bin goes at 0xAD4EFC
 Room_Draw.bin goes at 0xB19B5C
+room_uses_pointlights.bin goes at 0xAF19C4
 
 /* this ensures our custom structs are zero-initialized */
 write 00000000 00000000 at 0xAD4A4C
@@ -20,4 +21,3 @@ write 8005DD5C at 0xB9E670
 /* this change allocates an extra matrix for cylindrical billboards */
 write 0080 at 0xB362DE
 ```
-
