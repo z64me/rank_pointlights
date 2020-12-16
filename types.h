@@ -188,6 +188,11 @@ typedef struct {
 typedef union {
 	SCmdLightList         lightList;
 } SceneCmd;
+
+typedef struct {
+    /* 0x0000 */ char wow[0x1360];
+    /* 0x1360 */ uint32_t sceneSetupIndex;
+} SaveContext;
 /* end decomp structs */
 
 /* hacky new types */
