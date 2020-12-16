@@ -13,17 +13,15 @@ void *
 zh_evaluate_alt_headers(uint32_t *header)
 {
 	int setup = gSaveContext.sceneSetupIndex;
-	
+	uint32_t listLoc = 0;
+	uint32_t offset = 0;
+
 	if (setup && *((char*)header) == 0x18)
 	{
-		uint32_t *list = (void*)SEGMENTED_TO_VIRTUAL(header[1]);
-		
-		for (int i = setup - 1; i >= 0; --i)
-			if (list[i])
-				return (void*)SEGMENTED_TO_VIRTUAL(list[i]);
+		listLoc = ((( (uint32_t*)header)[1] ) & 0x00FFFFFF);
+		offset = ((( (uint32_t*)header)[(listLoc / 4) + (setup - 1)] ) & 0x00FFFFFF);;
 	}
-	
-	return header;
+	return header + (offset / 4);
 }
 
 int room_uses_pointlights(void *roomSegment)
@@ -33,8 +31,7 @@ int room_uses_pointlights(void *roomSegment)
 	/* locate 'end header' command */
 	while (*header != 0x14)
 		header += 8;
-	
+
 	/* command's second byte says whether to use point lights */
 	return header[1];
 }
-
