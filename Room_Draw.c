@@ -22,57 +22,38 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 	}
 	
 	/* point lighting magic courtesy of rankaisija */
-	for ( ; listHead; listHead = listHead->next)
-	{
+	for ( ; listHead; listHead = listHead->next) {
 		LightInfo *info = listHead->info;
 		LightParams *params = &info->params;
+		s32 i;
 
-		if (info->type == LIGHT_DIRECTIONAL)
-		{
-			Light *light = Lights_FindSlot(lights);
+		Light *light = Lights_FindSlot(lights);
 
-			if (light)
-			{
-				light->l.col[0] = light->l.colc[0] = params->dir.color[0];
-				light->l.col[1] = light->l.colc[1] = params->dir.color[1];
-				light->l.col[2] = light->l.colc[2] = params->dir.color[2];
+		if (light) {
+			if (info->type != LIGHT_DIRECTIONAL) {
+				float radiusF = params->point.radius;
+				radiusF = 4500000.0f / (radiusF * radiusF);
+
+				if (radiusF > 255)
+					radiusF = 255;
+				else if (radiusF < 180)
+					radiusF = 180;
+
+				for (i = 0; i < 3; i++)
+					light->lPos.col[i] = light->lPos.colc[i] = params->point.color[i];
+				light->lPos.pos[0] = params->point.x;
+				light->lPos.pos[1] = params->point.y;
+				light->lPos.pos[2] = params->point.z;
+				light->lPos.pad1 = 0x8;
+				light->lPos.pad2 = 0xFF;
+				light->lPos.pad3 = (unsigned char)radiusF;
+			} else {
+				for (i = 0; i < 3; i++)
+					light->l.col[i] = light->l.colc[i] = params->dir.color[i];
+				light->l.pad1 = 0;
 				light->l.dir[0] = params->dir.x;
 				light->l.dir[1] = params->dir.y;
 				light->l.dir[2] = params->dir.z;
-				light->l.pad1 = 0;
-			}
-		}
-		
-		else if (info->type == LIGHT_POINT_NOGLOW || info->type == LIGHT_POINT_GLOW)
-		{
-			float radiusF = params->point.radius;
-
-			if (radiusF > 0)
-			{
-				Light *light = Lights_FindSlot(lights);
-
-				if (light)
-				{
-					radiusF = 4500000.0f / (radiusF * radiusF);
-
-					if (radiusF > 255)
-						radiusF = 255;
-					else if (radiusF < 20)
-						radiusF = 20;
-
-					light->lPos.col[0] = params->point.color[0];
-					light->lPos.colc[0] = light->lPos.col[0];
-					light->lPos.col[1] = params->point.color[1];
-					light->lPos.colc[1] = light->lPos.col[1];
-					light->lPos.col[2] = params->point.color[2];
-					light->lPos.colc[2] = light->lPos.col[2];
-					light->lPos.pos[0] = params->point.x;
-					light->lPos.pos[1] = params->point.y;
-					light->lPos.pos[2] = params->point.z;
-					light->lPos.pad1 = 0x8;
-					light->lPos.pad2 = 0xff;
-					light->lPos.pad3 = (unsigned char)radiusF;
-				}
 			}
 		}
 	}
@@ -117,9 +98,10 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 		}
 	}
 
-	if (!gSaveContext.fw.set && wow_fw)
+	if (gSaveContext.fw.set == 0 && wow_fw == 1) {
 		LightContext_RemoveLight(globalCtx, &globalCtx->lightCtx, D_8015BC10);
-
+		D_8015BC10 = 0;
+	}
 	wow = globalCtx->sceneLoadFlag;
 	wow_fw = gSaveContext.fw.set;
 }
