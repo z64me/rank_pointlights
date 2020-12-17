@@ -1,4 +1,4 @@
-Point lighting in OoT: a collaboration with rankaisija
+Point lighting in OoT: a collaboration with **rankaisija**
 ```
 Patching instructions:
 
@@ -21,3 +21,7 @@ write 8005DD5C at 0xB9E670
 /* this change allocates an extra matrix for cylindrical billboards */
 write 0080 at 0xB362DE
 ```
+
+### Known issues
+* Entering a point-lit scene via map select, going back to map select, and re-entering the scene prevents lights from spawning. Work around this by re-re-entering from map select.
+* There are no known issues in normal gameplay, so we found it suitable for release.
