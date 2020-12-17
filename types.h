@@ -190,7 +190,20 @@ typedef union {
 } SceneCmd;
 
 typedef struct {
-    /* 0x0000 */ char wow[0x1360];
+    /* 0x00 */ char pos[0xC];
+    /* 0x0C */ s32 yaw;
+    /* 0x10 */ s32 playerParams;
+    /* 0x14 */ s32 entranceIndex;
+    /* 0x18 */ s32 roomIndex;
+    /* 0x1C */ s32 set;
+    /* 0x20 */ s32 tempSwchFlags;
+    /* 0x24 */ s32 tempCollectFlags;
+} FaroresWindData; // size = 0x28
+
+typedef struct {
+    /* 0x0000 */ char wow[0xE64];
+    /* 0x0E64 */ FaroresWindData fw;
+    /* 0x0E8C */ char unk_E8C[0x1360 - 0x0E8C];
     /* 0x1360 */ uint32_t sceneSetupIndex;
 } SaveContext;
 /* end decomp structs */
@@ -205,4 +218,3 @@ typedef struct RoomPointLights
 /* end hacky new types */
 
 #endif /* TYPES_H_INCLUDED */
-
