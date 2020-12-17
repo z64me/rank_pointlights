@@ -149,6 +149,7 @@ typedef struct {
 #define REG_PER_PAGE 16
 #define REG_PER_GROUP REG_PAGES * REG_PER_PAGE
 #define HREG(r) BASE_REG(21, r)
+#define SREG(r) BASE_REG(1, r)
 typedef struct {
     /* 0x00 */ s32  regPage;   // 1 is first page
     /* 0x04 */ s32  regGroup;  // "register" group (R, RS, RO, RP etc.)

@@ -115,8 +115,12 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 			which->roomSegment = 0;
 		}
 	}
-	
+
+	if (!gSaveContext.fw.set && wow_fw)
+		LightContext_RemoveLight(globalCtx, &globalCtx->lightCtx, D_8015BC10);
+
 	wow = globalCtx->sceneLoadFlag;
+	wow_fw = gSaveContext.fw.set;
 }
 
 /* create cylindrical billboard matrix */
