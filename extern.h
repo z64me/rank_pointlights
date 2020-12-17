@@ -37,6 +37,9 @@ asm("bzero = 0x80004450;");
 
 extern void bcopy(const void *src, void *dst, const uint32_t num);
 asm("bcopy = 0x80006F10;");
+
+extern LightNode *D_8015BC10;
+asm("D_8015BC10 = 0x8015BC10;");
 /* end decomp stuff */
 
 /* hacky stuff */
