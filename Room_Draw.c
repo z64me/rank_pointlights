@@ -87,7 +87,8 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 	RoomPointLights *which;
 	int k;
 	static char wow = 0;
-	
+	static char wow_fw = 0;
+
 	for (k = 0; k < 2; ++k)
 	{
 		switch (k)
