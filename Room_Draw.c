@@ -99,8 +99,7 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 	}
 
 	if (gSaveContext.fw.set == 0 && wow_fw == 1) {
-		LightContext_RemoveLight(globalCtx, &globalCtx->lightCtx, D_8015BC10);
-		D_8015BC10 = 0;
+		D_8015BC10->info->params.point.radius = 0;
 	}
 	wow = globalCtx->sceneLoadFlag;
 	wow_fw = gSaveContext.fw.set;
