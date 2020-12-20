@@ -38,20 +38,18 @@ register_room_light(RoomPointLights *wow, LightNode *light)
 	wow->numlights++;
 }
 
-// Scene Command 0x0C: Light List
+// Scene Command 0x0C: Light List, runs once when accessing new room/scene
 void func_80098B74(GlobalContext* globalCtx, SceneCmd* cmd) {
 	s32 i;
 	LightInfo* lightInfo;
 	LightNode *node;
 	RoomPointLights *wow = get_RoomPointLights(globalCtx->roomCtx.curRoom.segment);
 
+	// sceneLoadFlag is -14 when spawning into scene.
 	if (globalCtx->sceneLoadFlag < 0)
 	{
 	    RoomPointLightsA.roomSegment = RoomPointLightsB.roomSegment = 0;
 		RoomPointLightsA.numlights = RoomPointLightsB.numlights = 0;
-		if (!gSaveContext.fw.set) {
-			D_8015BC10->info->params.point.radius = 0;
-		}
 	}
 
 	if (!wow)
