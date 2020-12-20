@@ -1,6 +1,5 @@
 #include "types.h"
 #include "extern.h"
-#define VC_POINTLIGHT 64
 /*
 0x800a29bc ENTRY_POINT
 0xB19B5C   ROM_ADDR
