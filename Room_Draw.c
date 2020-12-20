@@ -38,13 +38,13 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 				light->lPos.pos[1] = params->point.y;
 				light->lPos.pos[2] = params->point.z;
 
-				#if VC_POINTLIGHT
+				#ifdef WII_VC
 
 					float radiusF = params->point.radius;
 					radiusF = (4500000.0f * 2) / (radiusF * radiusF);
 					radiusF = CLAMP(radiusF, 20, 255);
 
-					light->lPos.pad1 = 0x1; // Strenght + pointLightFlag
+					light->lPos.pad1 = 0x1; // Strength + pointLightFlag
 					if (!params->point.radius)
 						light->lPos.pad2 = 0xFF; // Zero Radius
 					else
