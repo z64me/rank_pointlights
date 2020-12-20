@@ -24,45 +24,72 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 	for ( ; listHead; listHead = listHead->next) {
 		LightInfo *info = listHead->info;
 		LightParams *params = &info->params;
-		s32 i;
-
 		Light *light = Lights_FindSlot(lights);
+		s32 i;
 
 		if (light) {
 			if (info->type != LIGHT_DIRECTIONAL) {
 				for (i = 0; i < 3; i++) {
 					light->lPos.col[i] = params->point.color[i];
-					light->lPos.colc[i] = 0;
+
+					// Does not seem to make difference but will
+					// be included just in case.
+					light->lPos.colc[i] = light->lPos.col[i];
 				}
 				light->lPos.pos[0] = params->point.x;
 				light->lPos.pos[1] = params->point.y;
 				light->lPos.pos[2] = params->point.z;
 
-				#ifdef WII_VC
+#ifdef WII_VC
+/**
+* VC Pointlight radius is only half the precision of
+* N64 pointlight. Also the pads are otherway around for
+* these two.
+* Pad1 = pointLightFlag, 0 reads the light as a
+*        directional light. Also seems to work as a
+*        light power value on VC?
+*
+* Pad2 = wiivc radius. Values go from smallest (0x80) to
+*        biggest (0x10). 0xFF is OFF. Values larger than 0x80
+*        do not make huge difference.
+*
+* Pad3 = Edge feather? Does not look good mostly. Might be
+*        useful when used correctly?
+*
+*/
+				float radiusF = params->point.radius;
 
-					float radiusF = params->point.radius;
-					radiusF = (4500000.0f * 2) / (radiusF * radiusF);
-					radiusF = CLAMP(radiusF, 20, 255);
+				radiusF = (4500000.0f) / (radiusF * radiusF);
+				radiusF *= 0.5;
+				radiusF = CLAMP(radiusF, 10, 0x78);
+				light->lPos.pad1 = 0x8;
+				if (!params->point.radius)
+					light->lPos.pad2 = 0xFF;
+				else
+					light->lPos.pad2 = radiusF;
+				light->lPos.pad3 = 0xFF;
 
-					light->lPos.pad1 = 0x1; // Strength + pointLightFlag
-					if (!params->point.radius)
-						light->lPos.pad2 = 0xFF; // Zero Radius
-					else
-						light->lPos.pad2 = radiusF / 2; // VC Radius
-					light->lPos.pad3 = 0xFF;
+#else /* N64 */
+/**
+* Pad1 = pointLightFlag, 0 reads the light as a
+*        directional light. No difference changing this
+*        value for N64.
+*
+* Pad2 = Edge feather? Does not look good mostly. Might be
+*        useful when used correctly?
+*
+* Pad3 = N64 radius. Values go from smallest (0xFF) to
+*        biggest (0x20).
+*/
 
+				float radiusF = params->point.radius;
 
-				#else /* N64_POINTLIGHT */
-
-					float radiusF = params->point.radius;
-					radiusF = (4500000.0f) / (radiusF * radiusF);
-					radiusF = CLAMP(radiusF, 20, 255);
-
-					light->lPos.pad1 = 0x8; // pointLightFlag
-					light->lPos.pad2 = 0xFF; // Unused?
-					light->lPos.pad3 = radiusF; // N64 Radius
-
-				#endif
+				radiusF = 4500000.0f / (radiusF * radiusF);
+				radiusF = CLAMP(radiusF, 20, 255);
+				light->lPos.pad1 = 0x8;
+				light->lPos.pad2 = 0xFF;
+				light->lPos.pad3 = radiusF;
+#endif
 			} else {
 				for (i = 0; i < 3; i++)
 					light->l.col[i] = light->l.colc[i] = params->dir.color[i];
@@ -78,12 +105,11 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 static
 inline
 void
-destroy_expired_RoomPointLights(GlobalContext *globalCtx)
-{
-	void *seg;
+destroy_expired_RoomPointLights(GlobalContext *globalCtx) {
 	RoomPointLights *which;
-	int k;
 	static char wow = 0;
+	void *seg;
+	int k;
 
 	for (k = 0; k < 2; ++k)
 	{
@@ -113,9 +139,8 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 		}
 	}
 
-	if (!gSaveContext.fw.set) {
+	if (!gSaveContext.fw.set)
 		D_8015BC10->info->params.point.radius = 0;
-	}
 	wow = globalCtx->sceneLoadFlag;
 }
 
