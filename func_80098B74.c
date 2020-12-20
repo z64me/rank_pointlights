@@ -45,11 +45,14 @@ void func_80098B74(GlobalContext* globalCtx, SceneCmd* cmd) {
 	LightNode *node;
 	RoomPointLights *wow = get_RoomPointLights(globalCtx->roomCtx.curRoom.segment);
 
-	// if (SREG(30))
-	// {
-	//     RoomPointLightsA.roomSegment = RoomPointLightsB.roomSegment = 0;
-	// 	RoomPointLightsA.numlights = RoomPointLightsB.numlights = 0;
-	// }
+	if (globalCtx->sceneLoadFlag < 0)
+	{
+	    RoomPointLightsA.roomSegment = RoomPointLightsB.roomSegment = 0;
+		RoomPointLightsA.numlights = RoomPointLightsB.numlights = 0;
+		if (!gSaveContext.fw.set) {
+			D_8015BC10->info->params.point.radius = 0;
+		}
+	}
 
 	if (!wow)
 		return;

@@ -68,7 +68,6 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 	RoomPointLights *which;
 	int k;
 	static char wow = 0;
-	static char wow_fw = 0;
 
 	for (k = 0; k < 2; ++k)
 	{
@@ -98,11 +97,10 @@ destroy_expired_RoomPointLights(GlobalContext *globalCtx)
 		}
 	}
 
-	if (gSaveContext.fw.set == 0 && wow_fw == 1) {
+	if (!gSaveContext.fw.set) {
 		D_8015BC10->info->params.point.radius = 0;
 	}
 	wow = globalCtx->sceneLoadFlag;
-	wow_fw = gSaveContext.fw.set;
 }
 
 /* create cylindrical billboard matrix */
