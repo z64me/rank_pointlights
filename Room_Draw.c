@@ -1,6 +1,6 @@
 #include "types.h"
 #include "extern.h"
-
+#define VC_POINTLIGHT 64
 /*
 0x800a29bc ENTRY_POINT
 0xB19B5C   ROM_ADDR
@@ -31,22 +31,41 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 
 		if (light) {
 			if (info->type != LIGHT_DIRECTIONAL) {
-				float radiusF = params->point.radius;
-				radiusF = 4500000.0f / (radiusF * radiusF);
-
-				if (radiusF > 255)
-					radiusF = 255;
-				else if (radiusF < 180)
-					radiusF = 180;
-
-				for (i = 0; i < 3; i++)
-					light->lPos.col[i] = light->lPos.colc[i] = params->point.color[i];
+				for (i = 0; i < 3; i++) {
+					light->lPos.col[i] = params->point.color[i];
+					light->lPos.colc[i] = 0;
+				}
 				light->lPos.pos[0] = params->point.x;
 				light->lPos.pos[1] = params->point.y;
 				light->lPos.pos[2] = params->point.z;
-				light->lPos.pad1 = 0x8;
-				light->lPos.pad2 = 0xFF;
-				light->lPos.pad3 = (unsigned char)radiusF;
+
+				timer++;
+
+				#if VC_POINTLIGHT
+
+					float radiusF = params->point.radius;
+					radiusF = (4500000.0f * 2) / (radiusF * radiusF);
+					radiusF = CLAMP(radiusF, 20, 255);
+
+					light->lPos.pad1 = 0x1; // Strenght + pointLightFlag
+					if (!params->point.radius)
+						light->lPos.pad2 = 0xFF; // Zero Radius
+					else
+						light->lPos.pad2 = radiusF / 2; // VC Radius
+					light->lPos.pad3 = 0xFF;
+
+
+				#else /* N64_POINTLIGHT */
+
+					float radiusF = params->point.radius;
+					radiusF = (4500000.0f) / (radiusF * radiusF);
+					radiusF = CLAMP(radiusF, 20, 255);
+
+					light->lPos.pad1 = 0x8; // pointLightFlag
+					light->lPos.pad2 = 0xFF; // Unused?
+					light->lPos.pad3 = radiusF; // N64 Radius
+
+				#endif
 			} else {
 				for (i = 0; i < 3; i++)
 					light->l.col[i] = light->l.colc[i] = params->dir.color[i];

@@ -14,7 +14,8 @@
 #define s16 signed short
 #define u8  unsigned char
 #define s8  signed char
-
+#define CLAMP(x, min, max) ((x) < (min) ? (min) : (x) > (max) ? (max) : (x))
+#define CLAMP_MAX(x, max) ((x) > (max) ? (max) : (x))
 #define NUM_SEGMENTS        (16)
 #define SEGMENT_OFFSET(a)   ((u32)(a) & 0x00ffffff)
 #define SEGMENT_NUMBER(a)   (((u32)(a) << 4) >> 28)
