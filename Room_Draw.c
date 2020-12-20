@@ -39,8 +39,6 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 				light->lPos.pos[1] = params->point.y;
 				light->lPos.pos[2] = params->point.z;
 
-				timer++;
-
 				#if VC_POINTLIGHT
 
 					float radiusF = params->point.radius;
