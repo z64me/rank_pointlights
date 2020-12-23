@@ -23,8 +23,8 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 
 		if (info->type != LIGHT_DIRECTIONAL) {
 			Vec3f lightPos = { params->point.x, params->point.y, params->point.z };
-			int32_t dist = Math_Vec3f_DistXZ(&globalCtx->mainCamera.eye, &lightPos);
-			int32_t radiusF = params->point.radius;
+			s32 dist = Math_Vec3f_DistXZ(&globalCtx->mainCamera.eye, &lightPos);
+			u32 radiusF = params->point.radius;
 
 			if (radiusF && dist < 800) {
 				Light *light = Lights_FindSlot(lights);
