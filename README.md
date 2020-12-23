@@ -35,5 +35,5 @@ write 0080 at 0xB362DE
 Run `make clean && make` to build. To build for Wii VC, run `make clean && make wiivc`
 
 ### Known issues
-* Entering a point-lit scene via map select, going back to map select, and re-entering the scene prevents lights from spawning. Work around this by re-re-entering from map select.
-* There are no known issues in normal gameplay, so we found it suitable for release.
+* Because of the limitation of N64, this supports only drawing 7 lights to room mesh. If there are more than 7, some lights will stop from drawing. For this reason the code is adjusted to draw lights on to map from certain distance. It hasn't yet been researched that much but actors spawned in the room seem to take highest priority in the order they are set in.
+* Env A/B lights are not drawn on to room. For directional lights, add one in Room Env tab in SO.
