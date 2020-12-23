@@ -5,16 +5,12 @@
 0xB19B5C   ROM_ADDR
 */
 
-extern int room_uses_pointlights(void *roomSegment);
-asm("room_uses_pointlights = 0x8007A824;");
-
 static
 inline
-void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
-{
+void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room) {
+	LightNode *listHead = globalCtx->lightCtx.listHead;
 	/* no point lighting in this room */
-	if (!room_uses_pointlights(room->segment))
-	{
+	if (!room_uses_pointlights(room->segment)) {
 		/* run original lighting routine */
 		Lights_BindAll(lights, listHead, 0);
 		return;
@@ -24,80 +20,82 @@ void Lights_HackyLightBind(Lights *lights, LightNode *listHead, Room *room)
 	for ( ; listHead; listHead = listHead->next) {
 		LightInfo *info = listHead->info;
 		LightParams *params = &info->params;
-		Light *light = Lights_FindSlot(lights);
-		s32 i;
 
-		if (light) {
-			if (info->type != LIGHT_DIRECTIONAL) {
-				for (i = 0; i < 3; i++) {
-					light->lPos.col[i] = params->point.color[i];
+		if (info->type != LIGHT_DIRECTIONAL) {
+			Vec3f lightPos = { params->point.x, params->point.y, params->point.z };
+			int32_t dist = Math_Vec3f_DistXZ(&globalCtx->mainCamera.eye, &lightPos);
+			int32_t radiusF = params->point.radius;
 
-					// Does not seem to make difference but will
-					// be included just in case.
-					light->lPos.colc[i] = light->lPos.col[i];
-				}
+			if (radiusF && dist < 800) {
+				Light *light = Lights_FindSlot(lights);
+
+				if (!light)
+					return;
+
+				light->lPos.col[0] = params->point.color[0];
+				light->lPos.col[1] = params->point.color[1];
+				light->lPos.col[2] = params->point.color[2];
+
 				light->lPos.pos[0] = params->point.x;
 				light->lPos.pos[1] = params->point.y;
 				light->lPos.pos[2] = params->point.z;
 
-#ifdef WII_VC
-/**
-* VC Pointlight radius is only half the precision of
-* N64 pointlight. Also the pads are otherway around for
-* these two.
-* Pad1 = pointLightFlag, 0 reads the light as a
-*        directional light. Also seems to work as a
-*        light power value on VC?
-*
-* Pad2 = wiivc radius. Values go from smallest (0x80) to
-*        biggest (0x10). 0xFF is OFF. Values larger than 0x80
-*        do not make huge difference.
-*
-* Pad3 = Edge feather? Does not look good mostly. Might be
-*        useful when used correctly?
-*
-*/
-				float radiusF = params->point.radius;
+				#ifdef WII_VC
+				/**
+				 * VC Pointlight radius is only half the precision of
+				 * N64 pointlight. Also the pads are otherway around for
+				 * these two.
+				 * Pad1 = pointLightFlag, 0 reads the light as a
+				 *        directional light. Also seems to work as a
+				 *        light power value on VC?
+				 *
+				 * Pad2 = wiivc radius. Values go from smallest (0x80) to
+				 *        biggest (0x10). 0xFF is OFF. Values larger than 0x80
+				 *        do not make huge difference.
+				 *
+				 * Pad3 = Edge feather? Does not look good mostly. Might be
+				 *        useful when used correctly?
+				 *
+				 */
 
-				radiusF = (4500000.0f) / (radiusF * radiusF);
-				radiusF *= 0.5;
+				radiusF = 4500000 / (radiusF * radiusF);
+				radiusF /= 2;
 				radiusF = CLAMP(radiusF, 10, 0x78);
 				light->lPos.pad1 = 0x8;
-				if (!params->point.radius)
-					light->lPos.pad2 = 0xFF;
-				else
-					light->lPos.pad2 = radiusF;
+				light->lPos.pad2 = radiusF;
 				light->lPos.pad3 = 0xFF;
 
-#else /* N64 */
-/**
-* Pad1 = pointLightFlag, 0 reads the light as a
-*        directional light. No difference changing this
-*        value for N64.
-*
-* Pad2 = Edge feather? Does not look good mostly. Might be
-*        useful when used correctly?
-*
-* Pad3 = N64 radius. Values go from smallest (0xFF) to
-*        biggest (0x20).
-*/
+				#else /* N64 */
+				/**
+				 * Pad1 = pointLightFlag, 0 reads the light as a
+				 *        directional light. No difference changing this
+				 *        value for N64.
+				 *
+				 * Pad2 = Edge feather? Does not look good mostly. Might be
+				 *        useful when used correctly?
+				 *
+				 * Pad3 = N64 radius. Values go from smallest (0xFF) to
+				 *        biggest (0x20).
+				 */
 
-				float radiusF = params->point.radius;
-
-				radiusF = 4500000.0f / (radiusF * radiusF);
+				radiusF = 4500000 / (radiusF * radiusF);
 				radiusF = CLAMP(radiusF, 20, 255);
 				light->lPos.pad1 = 0x8;
 				light->lPos.pad2 = 0xFF;
 				light->lPos.pad3 = radiusF;
-#endif
-			} else {
-				for (i = 0; i < 3; i++)
-					light->l.col[i] = light->l.colc[i] = params->dir.color[i];
-				light->l.pad1 = 0;
-				light->l.dir[0] = params->dir.x;
-				light->l.dir[1] = params->dir.y;
-				light->l.dir[2] = params->dir.z;
+				#endif
 			}
+		} else {
+			Light *light = Lights_FindSlot(lights);
+			if (!light)
+				return;
+			light->l.col[0] = params->dir.color[0];
+			light->l.col[1] = params->dir.color[1];
+			light->l.col[2] = params->dir.color[2];
+			light->l.dir[0] = params->dir.x;
+			light->l.dir[1] = params->dir.y;
+			light->l.dir[2] = params->dir.z;
+			light->l.pad1 = 0;
 		}
 	}
 }
@@ -183,7 +181,7 @@ void Room_Draw(GlobalContext *globalCtx, Room *room, u32 flags)
 	{
 		Lights *sp228;
 		sp228 = LightContext_NewLights(&globalCtx->lightCtx, globalCtx->state.gfxCtx);
-		Lights_HackyLightBind(sp228, globalCtx->lightCtx.listHead, room);
+		Lights_HackyLightBind(sp228, globalCtx, room);
 		Lights_Draw(sp228, globalCtx->state.gfxCtx);
 	}
 

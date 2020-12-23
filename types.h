@@ -23,6 +23,10 @@
 #define SEGMENTED_TO_VIRTUAL(addr) PHYSICAL_TO_VIRTUAL(gSegments[SEGMENT_NUMBER(addr)] + SEGMENT_OFFSET(addr))
 #define VIRTUAL_TO_PHYSICAL(addr) (u32)((u8*)(addr) - 0x80000000)
 
+typedef struct {
+	float x, y, z;
+} Vec3f;
+
 /* rankaisija structs */
 typedef struct {
   unsigned char    col[3];  /* diffuse light value (rgba) */
@@ -168,10 +172,21 @@ typedef struct Mtx {
 } Mtx;
 
 typedef struct {
+    char paramData[0x50];
+    /* 0x0050 */ Vec3f at;
+    /* 0x005C */ Vec3f eye;
+    /* 0x0068 */ Vec3f up;
+    /* 0x0074 */ Vec3f eyeNext;
+    /* 0x0080 */ char wow[0x16C - 0x0080];
+} Camera; // size = 0x16C
+
+typedef struct {
 	/* 0x00000 */ struct {
 		GraphicsContext *gfxCtx;
 	} state;
-	/* 0x00004 */ char wow[0x7A8 - 0x4];
+	/* 0x00004 */ char wow[0x001E0 - 0x4];
+	/* 0x001E0 */ Camera mainCamera;
+	/* 0x0034C */ char wowpad[0x007A8 - 0x34C];
 	/* 0x007A8 */ LightContext lightCtx;
 	/* 0x007B8 */ char wow1[0x11CBC - 0x7B8];
 	/* 0x11CBC */ RoomContext roomCtx;
