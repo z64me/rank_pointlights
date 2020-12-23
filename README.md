@@ -35,5 +35,5 @@ write 0080 at 0xB362DE
 Run `make clean && make` to build. To build for Wii VC, run `make clean && make wiivc`
 
 ### Known issues
-* Because of the limitation of N64, this supports only drawing 7 lights to room mesh. If there are more than 7, some lights will stop from drawing. For this reason the code is adjusted to draw lights on to map from certain distance. It hasn't yet been researched that much but actors spawned in the room seem to take highest priority in the order they are set in.
+* Because of the limitation of N64, this supports only drawing 7 lights to room mesh at once. If there are more than 7, some lights will stop from drawing. For this reason the code is adjusted to draw lights based on distance to camera. It hasn't yet been researched that much but actors spawned in the room seem to take highest priority in the order they are set in. Do note that Navi light is one of the last ones in priority. This can be avoided by not having too many light sources in small area.
 * Env A/B lights are not drawn on to room. For directional lights, add one in Room Env tab in SO.
