@@ -172,21 +172,30 @@ typedef struct Mtx {
 } Mtx;
 
 typedef struct {
-    char paramData[0x50];
-    /* 0x0050 */ Vec3f at;
-    /* 0x005C */ Vec3f eye;
-    /* 0x0068 */ Vec3f up;
-    /* 0x0074 */ Vec3f eyeNext;
-    /* 0x0080 */ char wow[0x16C - 0x0080];
-} Camera; // size = 0x16C
+	/* 0x0000 */ s32              magic; // string literal "VIEW" / 0x56494557
+	/* 0x0004 */ GraphicsContext* gfxCtx;
+	/* 0x0008 */ char             viewport[0x0018 - 0x0008];
+	/* 0x0018 */ float            fovy; // vertical field of view in degrees
+	/* 0x001C */ float            zNear; // distance to near clipping plane
+	/* 0x0020 */ float            zFar; // distance to far clipping plane
+	/* 0x0024 */ float            scale; // scale for matrix elements
+	/* 0x0028 */ Vec3f            eye;
+	/* 0x0034 */ Vec3f            lookAt;
+	/* 0x0040 */ Vec3f            up;
+	             float            pad;
+	/* 0x0050 */ char             vp[0x128 - 0x0050];
+} View; // size = 0x128
 
 typedef struct {
 	/* 0x00000 */ struct {
 		GraphicsContext *gfxCtx;
 	} state;
-	/* 0x00004 */ char wow[0x001E0 - 0x4];
-	/* 0x001E0 */ Camera mainCamera;
-	/* 0x0034C */ char wowpad[0x007A8 - 0x34C];
+	/* 0x00004 */ char wow[0x000B8 - 0x4];
+	/* 0x000B8 */ View view;
+	/* 0x001E0 */ char wowpad[0x00230 - 0x001E0];
+	/* 0x00230 */ Vec3f at;
+	/* 0x0023C */ Vec3f eye;
+	/* 0x00248 */ char wowpad2[0x007A8 - 0x248];
 	/* 0x007A8 */ LightContext lightCtx;
 	/* 0x007B8 */ char wow1[0x11CBC - 0x7B8];
 	/* 0x11CBC */ RoomContext roomCtx;

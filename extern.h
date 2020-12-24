@@ -49,9 +49,6 @@ asm("Math_Vec3f_DistXZ = 0x80078028;");
 
 extern s16 Math_Vec3f_Yaw(Vec3f* a, Vec3f* b);
 asm("Math_Vec3f_Yaw = 0x80078068;");
-
-extern int room_uses_pointlights(void *roomSegment);
-asm("room_uses_pointlights = 0x8007A824;");
 /* end decomp stuff */
 
 /* hacky stuff */

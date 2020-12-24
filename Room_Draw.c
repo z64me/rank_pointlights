@@ -23,10 +23,11 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 
 		if (info->type != LIGHT_DIRECTIONAL) {
 			Vec3f lightPos = { params->point.x, params->point.y, params->point.z };
-			s32 dist = Math_Vec3f_DistXZ(&globalCtx->mainCamera.eye, &lightPos);
+			s32 dist = Math_Vec3f_DistXZ(&globalCtx->eye, &lightPos);
 			u32 radiusF = params->point.radius;
+			s16 yawCam = (s32)((Math_Vec3f_Yaw(&globalCtx->eye, &globalCtx->at) - Math_Vec3f_Yaw(&globalCtx->eye, &lightPos)));
 
-			if (radiusF && dist < 800) {
+			if (radiusF && dist < 1200 && !((yawCam > 12000 || yawCam < -12000) && dist > 100)) {
 				Light *light = Lights_FindSlot(lights);
 
 				if (!light)
@@ -59,11 +60,14 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 				 */
 
 				radiusF = 4500000 / (radiusF * radiusF);
-				radiusF /= 2;
-				radiusF = CLAMP(radiusF, 10, 0x78);
-				light->lPos.pad1 = 0x8;
-				light->lPos.pad2 = radiusF;
-				light->lPos.pad3 = 0xFF;
+ 				radiusF /= 2;
+ 				if (radiusF < 10)
+ 					radiusF = 10;
+ 				if (radiusF > 0x78)
+ 					radiusF = 0x78;
+ 				light->lPos.pad1 = 0x8;
+ 				light->lPos.pad2 = radiusF;
+ 				light->lPos.pad3 = 0xFF;
 
 				#else /* N64 */
 				/**
@@ -79,10 +83,13 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 				 */
 
 				radiusF = 4500000 / (radiusF * radiusF);
-				radiusF = CLAMP(radiusF, 20, 255);
-				light->lPos.pad1 = 0x8;
-				light->lPos.pad2 = 0xFF;
-				light->lPos.pad3 = radiusF;
+ 				if (radiusF < 20)
+ 					radiusF = 20;
+ 				if (radiusF > 255)
+ 					radiusF = 255;
+ 				light->lPos.pad1 = 0x8;
+ 				light->lPos.pad2 = 0xFF;
+ 				light->lPos.pad3 = radiusF;
 				#endif
 			}
 		} else {
@@ -176,14 +183,14 @@ void Room_Draw(GlobalContext *globalCtx, Room *room, u32 flags)
 	
 	/* generate cylindrical billboard */
 	billboard_cylinder(globalCtx);
-	
-	if ((HREG(80) != 10) || (HREG(90) & 8))
-	{
+
+	// if ((HREG(80) != 10) || (HREG(90) & 8)) // Does not seem to affect game in any way. But we'll keep these as commented out just in case.
+	// {
 		Lights *sp228;
 		sp228 = LightContext_NewLights(&globalCtx->lightCtx, globalCtx->state.gfxCtx);
 		Lights_HackyLightBind(sp228, globalCtx, room);
 		Lights_Draw(sp228, globalCtx->state.gfxCtx);
-	}
+	// }
 
 #if 0
 	if (room->mesh->polygon.type >= ARRAY_COUNTU(sRoomDrawHandlers))
