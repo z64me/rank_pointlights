@@ -27,7 +27,7 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 			u32 radiusF = params->point.radius;
 			s16 yawCam = (s32)((Math_Vec3f_Yaw(&globalCtx->eye, &globalCtx->at) - Math_Vec3f_Yaw(&globalCtx->eye, &lightPos)));
 
-			if (radiusF && dist < 1200 && !((yawCam > 12000 || yawCam < -12000) && dist > 100)) {
+			if (radiusF && dist < 1200 && !((yawCam > 13000 || yawCam < -13000) && dist > 400)) {
 				Light *light = Lights_FindSlot(lights);
 
 				if (!light)
