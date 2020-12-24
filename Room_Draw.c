@@ -33,10 +33,6 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 				if (!light)
 					return;
 
-				light->lPos.col[0] = params->point.color[0];
-				light->lPos.col[1] = params->point.color[1];
-				light->lPos.col[2] = params->point.color[2];
-
 				light->lPos.pos[0] = params->point.x;
 				light->lPos.pos[1] = params->point.y;
 				light->lPos.pos[2] = params->point.z;
@@ -58,6 +54,9 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 				 *        useful when used correctly?
 				 *
 				 */
+				light->lPos.col[0] = params->point.color[0];
+ 				light->lPos.col[1] = params->point.color[1];
+ 				light->lPos.col[2] = params->point.color[2];
 
 				radiusF = 4500000 / (radiusF * radiusF);
  				radiusF /= 2;
@@ -81,6 +80,9 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 				 * Pad3 = N64 radius. Values go from smallest (0xFF) to
 				 *        biggest (0x20).
 				 */
+				light->lPos.col[0] = light->lPos.colc[0] = params->point.color[0];
+ 				light->lPos.col[1] = light->lPos.colc[1] = params->point.color[1];
+ 				light->lPos.col[2] = light->lPos.colc[2] = params->point.color[2];
 
 				radiusF = 4500000 / (radiusF * radiusF);
  				if (radiusF < 20)
