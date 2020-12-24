@@ -5,12 +5,6 @@
 0xB19B5C   ROM_ADDR
 */
 
-typedef struct {
-	float x;
-	s32 saveSpace;
-	float z;
-} Vec3fLimited;
-
 static
 inline
 void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room) {
@@ -28,10 +22,10 @@ void Lights_HackyLightBind(Lights *lights, GlobalContext* globalCtx, Room *room)
 		LightParams *params = &info->params;
 
 		if (info->type != LIGHT_DIRECTIONAL) {
-			Vec3fLimited lightPos = { params->point.x, 0, params->point.z };
-			s32 dist = Math_Vec3f_DistXZ(&globalCtx->eye, (Vec3f*)&lightPos);
+			Vec3f lightPos = { params->point.x, 0, params->point.z };
+			s32 dist = Math_Vec3f_DistXZ(&globalCtx->eye, &lightPos);
 			s32 radiusF = params->point.radius;
-			s16 yawCam = (s32)((Math_Vec3f_Yaw(&globalCtx->eye, &globalCtx->at) - Math_Vec3f_Yaw(&globalCtx->eye, (Vec3f*)&lightPos)));
+			s16 yawCam = (s32)((Math_Vec3f_Yaw(&globalCtx->eye, &globalCtx->at) - Math_Vec3f_Yaw(&globalCtx->eye, &lightPos)));
 
 			if (radiusF && dist < 1200 && !((yawCam > 13000 || yawCam < -13000) && dist > 400)) {
 				Light *light = Lights_FindSlot(lights);
