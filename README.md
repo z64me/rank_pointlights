@@ -31,6 +31,11 @@ write 8005DD5C at 0xB9E670
 write 0080 at 0xB362DE
 ```
 
+### Room File Implementation (`.zmap`)
+This mod supports selectively using point lighting in alternate headers. For any header where you want point lighting enabled, the end-header command `14000000 00000000` should be updated to `14010000 00000000`.
+
+You need `G_LIGHTING_POSITIONAL` (`0x00400000`) enabled in the `GeometryMode` for materials meant to use point lighting.
+
 ### Building
 Run `make clean && make` to build. To build for Wii VC, run `make clean && make wiivc`
 
